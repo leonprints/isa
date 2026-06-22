@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Per Isa 🎹</title>
+    <style>
+        body {
+            margin: 0;
+            background: #fcfbfa;
+            color: #2c2c2c;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Georgia, serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            transition: background 1s ease;
+        }
+        #container {
+            text-align: center;
+            max-width: 500px;
+            padding: 20px;
+            position: relative;
+        }
+        .instruction {
+            font-size: 1.1rem;
+            color: #8c8c8c;
+            margin-bottom: 40px;
+            font-style: italic;
+            animation: fade 2s infinite alternate;
+        }
+        @keyframes fade { from { opacity: 0.5; } to { opacity: 1; } }
+        
+        /* Pianoforte minimale */
+        #piano {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            margin: 0 auto;
+            width: 280px;
+            height: 150px;
+        }
+        .key {
+            width: 40px;
+            height: 100%;
+            border: 1px solid #dcdcdc;
+            background: white;
+            border-radius: 0 0 4px 4px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            z-index: 1;
+            transition: background 0.1s;
+        }
+        .key:active { background: #f0f0f0; }
+        .key.black {
+            width: 24px;
+            height: 60%;
+            background: #1a1a1a;
+            margin-left: -12px;
+            margin-right: -12px;
+            z-index: 2;
+            border: none;
+        }
+        .key.black:active { background: #333; }
+
+        /* Ideogramma Karate */
+        #karate-icon {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            font-size: 5rem;
+            color: #1a1a1a;
+            opacity: 0;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .break {
+            animation: breakAnim 0.8s forwards ease-in-out;
+        }
+        @keyframes breakAnim {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            30% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1); opacity: 1; filter: blur(0); }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; filter: blur(10px); }
+        }
+
+        /* Lettera Finale */
+        #letter {
+            display: none;
+            opacity: 0;
+            text-align: center;
+            margin-top: -100px;
+            z-index: 5;
+        }
+        h1 {
+            font-family: Georgia, serif;
+            font-weight: 300;
+            letter-spacing: 4px;
+            color: #1a1a1a;
+            margin-bottom: 30px;
+        }
+        p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: #4a4a4a;
+            margin-bottom: 15px;
+        }
+        .cherry-blossom {
+            position: absolute;
+            background: #ffb7c5;
+            border-radius: 50% 0 50% 50%;
+            pointer-events: none;
+            opacity: 0.8;
+            animation: fall 3s linear forwards;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(100vh) translateX(100px) rotate(360deg); opacity: 0; }
+        }
+        .shake { animation: shake 0.15s 3; }
+        @keyframes shake { 0% { transform: translate(2px, 1px); } 50% { transform: translate(-1px, -2px); } 100% { transform: translate(1px, 2px); } }
+    </style>
+</head>
+<body>
+
+    <div id="container">
+        <div id="interactive-part">
+            <div class="instruction">Suona qualcosa Isotta</div>
+            <div id="piano">
+                <div class="key" onclick="playNote(261.63)"></div>
+                <div class="key black" onclick="playNote(277.18)"></div>
+                <div class="key" onclick="playNote(293.66)"></div>
+                <div class="key black" onclick="playNote(311.13)"></div>
+                <div class="key" onclick="playNote(329.63)"></div>
+                <div class="key" onclick="playNote(349.23)"></div>
+            </div>
+        </div>
+
+        <div id="karate-icon">空手</div>
+
+        <div id="letter">
+            <h1>AUGURI ISAAAA</h1>
+            <p>Sognatrice (forse, spero) nella musica ma<br>forte e cazzutissima quando si arrabbia.</p>
+            <p><strong>Buon compleanno! 🌸🥋🎹</strong></p>
+        </div>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playNote(freq) {
+            clickCount++;
+            
+            // Riproduce un suono morbido tipo piano/sinusoide
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.8);
+
+            // Alla quinta nota scatta l'effetto inaspettato
+            if (clickCount === 5) {
+                setTimeout(triggerSurprise, 400);
+            }
+        }
+
+        function triggerSurprise() {
+            document.body.classList.add('shake');
+            const icon = document.getElementById('karate-icon');
+            icon.classList.add('break');
+
+            // Suono di un impatto secco ma armonico
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.6, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+
+            setTimeout(() => {
+                document.body.classList.remove('shake');
+                document.getElementById('interactive-part').style.display = 'none';
+                document.body.style.backgroundColor = '#fff5f6'; // Sfondo rosa petalo delicato
+                
+                // Mostra la lettera
+                const letter = document.getElementById('letter');
+                letter.style.display = 'block';
+                setTimeout(() => letter.style.opacity = '1', 50);
+
+                // Avvia la pioggia di petali
+                setInterval(createPetal, 150);
+                playMelody();
+            }, 500);
+        }
+
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('cherry-blossom');
+            petal.style.left = Math.random() * window.innerWidth + 'px';
+            petal.style.width = Math.random() * 10 + 10 + 'px';
+            petal.style.height = petal.style.width;
+            petal.style.animationDuration = Math.random() * 2 + 2 + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 4000);
+        }
+
+        // Suona dolcemente "Tanti Auguri" in sottofondo alla fine
+        function playMelody() {
+            const birthdayNotes = [
+                261.63, 261.63, 293.66, 261.63, 349.23, 329.63,
+                261.63, 261.63, 293.66, 261.63, 392.00, 349.23
+            ];
+            const durations = [0.4, 0.4, 0.8, 0.8, 0.8, 1.2, 0.4, 0.4, 0.8, 0.8, 0.8, 1.2];
+            let time = audioCtx.currentTime + 0.5;
+
+            birthdayNotes.forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, time);
+                gain.gain.setValueAtTime(0.2, time);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + durations[index]);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(time);
+                osc.stop(time + durations[index]);
+                time += durations[index] * 0.8;
+            });
+        }
+    </script>
+</body>
+</html>
